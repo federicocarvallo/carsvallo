@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carsvallo — Elegancia en Movimiento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ===================== VARIABLES ===================== */
+    :root {
+      --bg-primary:    #090909;
+      --bg-secondary:  #111111;
+      --bg-card:       #161616;
+      --bg-card-hover: #1c1c1c;
+      --silver:        #9E9E9E;
+      --silver-light:  #C2C2C2;
+      --silver-dim:    #555555;
+      --text-primary:  #F0F0F0;
+      --text-muted:    #6B6B6B;
+      --border:        #222222;
+      --border-light:  #2E2E2E;
+      --teal:          #1AA3B0;
+      --teal-dark:     #148A96;
+      --teal-dim:      rgba(26,163,176,0.15);
+      --wa-green:      #25D366;
+      --wa-dark:       #1DA851;
+      --font-display:  'Playfair Display', Georgia, 'Times New Roman', serif;
+      --font-body:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --ease-out:      cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ===================== RESET ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ===================== CONTAINER ===================== */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+    /* ===================== REVEAL ===================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===================== BUTTONS ===================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 30px;
+      border-radius: 3px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.28s var(--ease-out);
+      border: none;
+      white-space: nowrap;
+    }
+    .btn--primary { background: var(--silver); color: #080808; }
+    .btn--primary:hover { background: var(--silver-light); transform: translateY(-1px); }
+    .btn--ghost { background: transparent; color: var(--silver); border: 1px solid rgba(158,158,158,0.35); }
+    .btn--ghost:hover { border-color: var(--silver); background: rgba(158,158,158,0.07); }
+    .btn--wa { background: var(--teal); color: #fff; }
+    .btn--wa:hover { background: var(--teal-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(26,163,176,0.35); }
+    .btn--teal { background: var(--teal); color: #fff; }
+    .btn--teal:hover { background: var(--teal-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(26,163,176,0.35); }
+    .btn--small { padding: 9px 18px; font-size: 0.72rem; }
+    .btn--large { padding: 16px 44px; font-size: 0.85rem; }
+
+    /* ===================== NAV ===================== */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 56px;
+      transition: padding 0.4s var(--ease-out), background 0.4s, border-color 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+    .nav--scrolled {
+      padding: 14px 56px;
+      background: rgba(9,9,9,0.93);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom-color: var(--border);
+    }
+    .nav__logo img {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+    .nav__links { display: flex; gap: 44px; }
+    .nav__links a {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav__links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0; height: 1px;
+      background: var(--silver);
+      transition: width 0.3s var(--ease-out);
+    }
+    .nav__links a:hover { color: var(--text-primary); }
+    .nav__links a:hover::after { width: 100%; }
+    .nav__cta {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #080808;
+      background: var(--silver);
+      padding: 9px 22px;
+      border-radius: 3px;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .nav__cta:hover { background: var(--silver-light); transform: translateY(-1px); }
+    .nav__menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav__menu-btn span {
+      display: block;
+      width: 22px; height: 1.5px;
+      background: var(--silver);
+      border-radius: 2px;
+      transition: all 0.3s var(--ease-out);
+    }
+    .nav__menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav__menu-btn.open span:nth-child(2) { opacity: 0; }
+    .nav__menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    .mobile-menu {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 190;
+      background: rgba(9,9,9,0.97);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s var(--ease-out);
+    }
+    .mobile-menu.open { opacity: 1; pointer-events: all; }
+    .mobile-menu ul { display: flex; flex-direction: column; gap: 32px; text-align: center; }
+    .mobile-menu a { font-family: var(--font-display); font-size: 2rem; color: var(--text-muted); transition: color 0.2s; }
+    .mobile-menu a:hover { color: var(--text-primary); }
+
+    /* ===================== HERO ===================== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      overflow: hidden;
+      padding: 120px 60px 80px;
+    }
+    .hero__inner {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      max-width: 1100px;
+      width: 100%;
+    }
+    /* left: text */
+    .hero__left {
+      flex: 1;
+    }
+    .hero__eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 28px;
+    }
+    .hero__eyebrow-line { display: block; width: 24px; height: 1px; background: var(--teal); }
+    .hero__title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 4vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+    .hero__title em { font-style: italic; font-weight: 400; color: var(--teal); }
+    .hero__sub {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 36px;
+      max-width: 420px;
+    }
+    .hero__founder {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: 4px;
+      background: rgba(26,163,176,0.05);
+      margin-bottom: 36px;
+    }
+    .hero__founder-info strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .hero__founder-info span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* right: photo */
+    .hero__right {
+      flex-shrink: 0;
+      width: 280px;
+      text-align: center;
+    }
+    .hero__photo-caption {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .hero__photo-caption strong {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .hero__photo-caption span {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      text-transform: uppercase;
+    }
+    .hero__photo {
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 6px;
+      filter: grayscale(15%);
+      display: block;
+    }
+
+    /* scroll hint */
+    .hero__scroll {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 0.64rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      z-index: 3;
+    }
+    .hero__scroll-icon { animation: scrollBounce 2s infinite; }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ===================== DIVIDER ===================== */
+    .divider-strip {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 0;
+      display: flex;
+      gap: 28px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .divider-strip span {
+      font-size: 0.64rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--silver-dim);
+      flex-shrink: 0;
+    }
+
+    /* ===================== SECTION COMMONS ===================== */
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 14px;
+    }
+    .section-eyebrow::before, .section-eyebrow::after {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--teal);
+      opacity: 0.5;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.15;
+    }
+    .section-title em { font-style: italic; font-weight: 400; color: var(--silver); }
+    .section-desc { margin-top: 14px; font-size: 0.9rem; color: var(--text-muted); font-weight: 300; }
+
+    /* ===================== CATALOG ===================== */
+    .catalog { padding: 110px 0; background: var(--bg-secondary); }
+    .catalog__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    /* ===================== CAROUSEL ===================== */
+    .carousel { position: relative; overflow: hidden; background: #0f0f0f; }
+    .carousel__track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+    }
+    .carousel__track img {
+      min-width: 100%;
+      height: 260px;
+      object-fit: cover;
+      flex-shrink: 0;
+      display: block;
+    }
+    .carousel__btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      transition: background 0.2s;
+      z-index: 5;
+    }
+    .carousel__btn:hover { background: var(--teal); border-color: var(--teal); }
+    .carousel__btn--prev { left: 10px; }
+    .carousel__btn--next { right: 10px; }
+    .carousel__counter {
+      position: absolute;
+      bottom: 10px; right: 12px;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.45);
+      padding: 3px 8px;
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .carousel__dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+      z-index: 5;
+    }
+    .carousel__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .carousel__dot.active {
+      background: var(--teal);
+      transform: scale(1.3);
+    }
+
+    /* ===================== CAR CARD ===================== */
+    .car-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color 0.35s var(--ease-out), transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+    }
+    .car-card:hover {
+      border-color: rgba(158,158,158,0.4);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+    }
+    .car-card--featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+    .car-card--featured .car-card__image { height: 100%; min-height: 300px; }
+
+    .car-card__image { position: relative; height: 230px; overflow: hidden; background: #0f0f0f; }
+    .car-card__placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px;
+      background: linear-gradient(145deg, #111 0%, #181818 50%, #101010 100%);
+      transition: background 0.4s;
+    }
+    .car-card:hover .car-card__placeholder { background: linear-gradient(145deg, #151515 0%, #1e1e1e 50%, #141414 100%); }
+    .car-card__placeholder-icon { font-size: 2.2rem; color: var(--border-light); transition: color 0.3s; }
+    .car-card:hover .car-card__placeholder-icon { color: var(--silver-dim); }
+    .car-card__placeholder span { font-size: 0.64rem; letter-spacing: 0.3em; text-transform: uppercase; color: #333; }
+
+    .car-card__overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .car-card:hover .car-card__overlay { opacity: 1; }
+    .car-card__quick-view {
+      font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.45);
+      padding: 10px 22px; border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .car-card__quick-view:hover { background: rgba(255,255,255,0.1); }
+
+    .car-card__badge {
+      position: absolute; top: 14px; left: 14px;
+      background: var(--silver); color: #080808;
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 2px;
+    }
+    .car-card__badge--featured { background: linear-gradient(135deg, #b8960c, #d4af37); color: #fff; }
+    .car-card__badge--eco { background: #0f3d22; color: #5ddf8f; }
+
+    .car-card__body { padding: 22px 24px 24px; }
+    .car-card__top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .car-card__category { font-size: 0.64rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--silver-dim); }
+    .car-card__price { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--silver-light); }
+    .car-card__name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; line-height: 1.2; }
+    .car-card__specs { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .car-card__spec { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-muted); }
+    .car-card__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ===================== WHY ===================== */
+    .why { padding: 110px 0; background: var(--bg-primary); }
+    .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .why__item { padding: 44px 32px; background: var(--bg-primary); transition: background 0.3s; }
+    .why__item:hover { background: var(--bg-card); }
+    .why__num { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: #1e1e1e; margin-bottom: 20px; line-height: 1; transition: color 0.3s; }
+    .why__item:hover .why__num { color: var(--silver-dim); }
+    .why__item h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+    .why__item p { font-size: 0.82rem; font-weight: 300; color: var(--text-muted); line-height: 1.75; }
+
+    /* ===================== CONTACT ===================== */
+    .contact { padding: 120px 40px; background: var(--bg-secondary); text-align: center; position: relative; overflow: hidden; }
+    .contact::before {
+      content: 'CARSVALLO';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: 14vw; font-weight: 700;
+      color: rgba(255,255,255,0.018);
+      white-space: nowrap; pointer-events: none; letter-spacing: 0.1em;
+    }
+    .contact__inner { position: relative; z-index: 1; max-width: 580px; margin: 0 auto; }
+    .contact__title { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 700; color: var(--text-primary); line-height: 1.15; margin: 14px 0 20px; }
+    .contact__title em { font-style: italic; font-weight: 400; color: var(--silver); }
+    .contact__sub { font-size: 0.9rem; font-weight: 300; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; }
+
+    /* ===================== FOOTER ===================== */
+    .footer { background: #060606; border-top: 1px solid var(--border); padding: 52px 0 28px; }
+    .footer__top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 44px; }
+    .footer__logo { display: block; font-family: var(--font-display); font-size: 1.15rem; letter-spacing: 0.22em; color: var(--silver-light); margin-bottom: 8px; }
+    .footer__brand p { font-size: 0.78rem; color: var(--text-muted); font-weight: 300; }
+    .footer__nav { display: flex; gap: 36px; align-items: center; }
+    .footer__nav a { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); transition: color 0.2s; }
+    .footer__nav a:hover { color: var(--text-primary); }
+    .footer__bottom { border-top: 1px solid var(--border); padding-top: 24px; text-align: center; }
+    .footer__bottom p { font-size: 0.72rem; letter-spacing: 0.06em; color: var(--text-muted); }
+
+    /* ===================== WHATSAPP FLOAT ===================== */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 500;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--teal); color: #fff;
+      padding: 14px 20px 14px 16px;
+      border-radius: 50px;
+      box-shadow: 0 4px 24px rgba(37,211,102,0.3);
+      transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+    }
+    .wa-float:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(26,163,176,0.45); }
+    .wa-float__label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; white-space: nowrap; }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 1024px) {
+      .catalog__grid { grid-template-columns: repeat(2, 1fr); }
+      .car-card--featured { grid-column: 1 / -1; grid-template-columns: 1fr; }
+      .car-card--featured .car-card__image { height: 260px; }
+      .why__grid { grid-template-columns: repeat(2, 1fr); }
+      .hero { padding: 120px 40px 60px; }
+      .hero__inner { gap: 40px; }
+      .hero__right { width: 220px; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 16px 20px; }
+      .nav__links, .nav__cta { display: none; }
+      .nav__menu-btn { display: flex; }
+      .container { padding: 0 20px; }
+      .hero { padding: 90px 20px 60px; min-height: auto; }
+      .hero__inner { flex-direction: column-reverse; gap: 24px; align-items: center; }
+      .hero__left { width: 100%; }
+      .hero__right { width: 140px; }
+      .hero__title { font-size: clamp(2rem, 8vw, 2.6rem); }
+      .hero__sub { font-size: 0.92rem; max-width: 100%; }
+      .hero__actions { flex-direction: column; gap: 10px; }
+      .hero__actions .btn { width: 100%; justify-content: center; }
+      .catalog { padding: 70px 0; }
+      .catalog__grid { grid-template-columns: 1fr; gap: 16px; }
+      .car-card--featured { grid-column: 1; grid-template-columns: 1fr; }
+      .carousel__track img { height: 220px; }
+      .car-card__body { padding: 18px 18px 20px; }
+      .car-card__specs { gap: 12px; }
+      .why { padding: 70px 0; }
+      .why__grid { grid-template-columns: 1fr; }
+      .why__item { padding: 32px 24px; }
+      .contact { padding: 70px 20px; }
+      .footer { padding: 44px 0 24px; }
+      .footer__top { flex-direction: column; gap: 24px; }
+      .footer__nav { flex-direction: column; gap: 14px; align-items: flex-start; }
+      .wa-float__label { display: none; }
+      .wa-float { padding: 14px; border-radius: 50%; bottom: 20px; right: 20px; box-shadow: 0 4px 20px rgba(26,163,176,0.4); }
+      .section-header { margin-bottom: 40px; }
+    }
+    @media (max-width: 420px) {
+      .hero__title { font-size: 1.9rem; }
+      .hero__right { width: 110px; }
+      .carousel__track img { height: 190px; }
+      .nav__logo img { height: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav__logo">
+      <img src="Bajada Carsvallo blanco 1.png" alt="Carsvallo" />
+    </div>
+    <ul class="nav__links">
+      <li><a href="#catalogo">Catálogo</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <button class="nav__menu-btn" id="menuBtn" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#catalogo" class="mobile-link">Catálogo</a></li>
+      <li><a href="#nosotros" class="mobile-link">Nosotros</a></li>
+      <li><a href="#contacto" class="mobile-link">Contacto</a></li>
+    </ul>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__inner">
+    <!-- Foto izquierda -->
+    <div class="hero__right">
+      <img src="Post carrusel intro.png" alt="Federico Carvallo - Fundador Carsvallo" class="hero__photo" />
+      <div class="hero__photo-caption">
+        <strong>Federico Carvallo</strong>
+        <span>Fundador · Carsvallo</span>
+      </div>
+    </div>
+
+    <!-- Texto derecha -->
+    <div class="hero__left reveal">
+      <p class="hero__eyebrow">
+        <span class="hero__eyebrow-line"></span>
+        Gestión y servicios automotrices de confianza
+      </p>
+      <h1 class="hero__title">
+        Te vendemos<br /><em>el auto</em>
+      </h1>
+      <p class="hero__sub">Publicamos, exhibimos y gestionamos la venta por ti. Rápido, seguro y sin complicaciones.</p>
+      <div class="hero__actions">
+        <a href="https://wa.me/56983229640?text=Hola%20Federico%2C%20quiero%20vender%20mi%20auto%20con%20Carsvallo" class="btn btn--teal" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+          Quiero vender mi auto
+        </a>
+        <a href="#catalogo" class="btn btn--ghost">Ver autos disponibles</a>
+      </div>
+    </div>
+    </div><!-- /hero__inner -->
+
+    <a href="#catalogo" class="hero__scroll">
+      <span>Descubrir</span>
+      <div class="hero__scroll-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+    </a>
+  </section>
+
+
+  <!-- CATÁLOGO -->
+  <section class="catalog" id="catalogo">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Autos disponibles</p>
+        <h2 class="section-title">Encuentra <em>tu auto</em></h2>
+        <p class="section-desc">Vehículos verificados, con historial claro y precio justo. Sin sorpresas.</p>
+      </div>
+      <div class="catalog__grid">
+
+        <!-- SUBARU FORESTER 2019 -->
+        <article class="car-card reveal" data-delay="0">
+          <div class="car-card__image carousel" id="car-subaru">
+            <div class="carousel__track">
+              <img src="fotos/subaru/01.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/02.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/03.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/04.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/05.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/06.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/07.jpg" alt="Subaru Forester 2019" loading="lazy">
+              <img src="fotos/subaru/08.jpg" alt="Subaru Forester 2019" loading="lazy">
+            </div>
+            <button class="carousel__btn carousel__btn--prev">‹</button>
+            <button class="carousel__btn carousel__btn--next">›</button>
+            <span class="carousel__counter">1 / 8</span>
+          </div>
+          <div class="car-card__body">
+            <div class="car-card__top">
+              <p class="car-card__category">SUV · 2019</p>
+            </div>
+            <h3 class="car-card__name">Subaru Forester</h3>
+            <div class="car-card__specs">
+              <div class="car-card__spec"><span>📍</span><span>97.000 km</span></div>
+              <div class="car-card__spec"><span>⚙</span><span>Automático</span></div>
+              <div class="car-card__spec"><span>👤</span><span>2 dueños</span></div>
+            </div>
+            <div class="car-card__actions">
+              <a href="https://wa.me/56983229640?text=Hola%20Federico%2C%20me%20interesa%20el%20Subaru%20Forester%202019.%20%C2%BFPuedes%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" class="btn btn--wa btn--small" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+                Consultar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- FORD FUSION 2018 -->
+        <article class="car-card reveal" data-delay="100">
+          <div class="car-card__image carousel" id="car-fusion">
+            <div class="carousel__track">
+              <img src="fotos/fusion/01.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/02.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/03.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/04.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/05.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/06.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/07.jpg" alt="Ford Fusion 2018" loading="lazy">
+              <img src="fotos/fusion/08.jpg" alt="Ford Fusion 2018" loading="lazy">
+            </div>
+            <button class="carousel__btn carousel__btn--prev">‹</button>
+            <button class="carousel__btn carousel__btn--next">›</button>
+            <span class="carousel__counter">1 / 8</span>
+          </div>
+          <div class="car-card__body">
+            <div class="car-card__top">
+              <p class="car-card__category">Sedán · 2018</p>
+            </div>
+            <h3 class="car-card__name">Ford Fusion</h3>
+            <div class="car-card__specs">
+              <div class="car-card__spec"><span>📍</span><span>141.000 km</span></div>
+              <div class="car-card__spec"><span>⚙</span><span>Automático</span></div>
+              <div class="car-card__spec"><span>👤</span><span>1 dueño</span></div>
+            </div>
+            <div class="car-card__actions">
+              <a href="https://wa.me/56983229640?text=Hola%20Federico%2C%20me%20interesa%20el%20Ford%20Fusion%202018.%20%C2%BFPuedes%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" class="btn btn--wa btn--small" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+                Consultar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- VOLVO XC60 2018 -->
+        <article class="car-card reveal" data-delay="200">
+          <div class="car-card__image carousel" id="car-volvo">
+            <div class="carousel__track">
+              <img src="fotos/volvo/01.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/02.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/03.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/04.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/05.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/06.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/07.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/08.jpg" alt="Volvo XC60 2018" loading="lazy">
+              <img src="fotos/volvo/09.jpg" alt="Volvo XC60 2018" loading="lazy">
+            </div>
+            <button class="carousel__btn carousel__btn--prev">‹</button>
+            <button class="carousel__btn carousel__btn--next">›</button>
+            <span class="carousel__counter">1 / 9</span>
+          </div>
+          <div class="car-card__body">
+            <div class="car-card__top">
+              <p class="car-card__category">SUV · 2018</p>
+            </div>
+            <h3 class="car-card__name">Volvo XC60</h3>
+            <div class="car-card__specs">
+              <div class="car-card__spec"><span>📍</span><span>156.000 km</span></div>
+              <div class="car-card__spec"><span>⚙</span><span>Automático</span></div>
+              <div class="car-card__spec"><span>👤</span><span>2 dueños</span></div>
+            </div>
+            <div class="car-card__actions">
+              <a href="https://wa.me/56983229640?text=Hola%20Federico%2C%20me%20interesa%20el%20Volvo%20XC60%202018.%20%C2%BFPuedes%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" class="btn btn--wa btn--small" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+                Consultar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- POR QUÉ CARSVALLO -->
+  <section class="why" id="nosotros">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Nuestra promesa</p>
+        <h2 class="section-title">¿Por qué <em>Carsvallo</em>?</h2>
+      </div>
+      <div class="why__grid">
+        <div class="why__item reveal" data-delay="0">
+          <div class="why__num">01</div>
+          <h3>Gestión transparente</h3>
+          <p>Te explicamos cada paso del proceso. Sin letra chica, sin sorpresas. Sabes exactamente qué estás comprando o vendiendo.</p>
+        </div>
+        <div class="why__item reveal" data-delay="100">
+          <div class="why__num">02</div>
+          <h3>Autos verificados</h3>
+          <p>Revisamos el historial, kilometraje y estado de cada vehículo antes de publicarlo. Tu tranquilidad es nuestra prioridad.</p>
+        </div>
+        <div class="why__item reveal" data-delay="200">
+          <div class="why__num">03</div>
+          <h3>Vende tu auto fácil</h3>
+          <p>Te ayudamos a tasar, publicar y cerrar la venta de tu auto de forma rápida, segura y al mejor precio del mercado.</p>
+        </div>
+        <div class="why__item reveal" data-delay="300">
+          <div class="why__num">04</div>
+          <h3>Asesoría real</h3>
+          <p>Una persona real te atiende por WhatsApp. Sin bots, sin formularios. Respondemos hoy y te acompañamos hasta el final.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contact" id="contacto">
+    <div class="contact__inner reveal">
+      <p class="section-eyebrow">Conversemos</p>
+      <h2 class="contact__title">¿Quieres comprar<br />o <em>vender tu auto</em>?</h2>
+      <p class="contact__sub">Escríbenos por WhatsApp ahora mismo.<br />Una persona real te responde hoy.</p>
+      <a href="https://wa.me/56983229640?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20autos%20Carsvallo" class="btn btn--wa btn--large" target="_blank" style="margin: 0 auto;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+        Escribir por WhatsApp
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <img src="Bajada Carsvallo blanco 1.png" alt="Carsvallo" style="height:38px; width:auto; display:block; margin-bottom:10px; opacity:0.9;" />
+        </div>
+        <nav class="footer__nav">
+          <a href="#catalogo">Catálogo</a>
+          <a href="#nosotros">Nosotros</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2026 Carsvallo. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
+  <a href="https://wa.me/56983229640?text=Hola%2C%20vi%20la%20p%C3%A1gina%20de%20Carsvallo%20y%20me%20interesa%20un%20auto"
+     class="wa-float" target="_blank" aria-label="Chat por WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.535 5.875L.057 23.886l6.194-1.623A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.032-1.371l-.361-.214-3.741.981.998-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.421 0 9.894 4.474 9.894 9.894 0 5.421-4.473 9.894-9.894 9.894z"/></svg>
+    <span class="wa-float__label">¿Hablamos?</span>
+  </a>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('nav--scrolled', window.scrollY > 40);
+    });
+
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => {
+      menuBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menuBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => entry.target.classList.add('visible'), Number(delay));
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Carousels ──────────────────────────────────────────────
+    document.querySelectorAll('.carousel').forEach(carousel => {
+      const track   = carousel.querySelector('.carousel__track');
+      const images  = carousel.querySelectorAll('.carousel__track img');
+      const prevBtn = carousel.querySelector('.carousel__btn--prev');
+      const nextBtn = carousel.querySelector('.carousel__btn--next');
+      const counter = carousel.querySelector('.carousel__counter');
+      const total   = images.length;
+      let current   = 0;
+
+      function goTo(index) {
+        current = (index + total) % total;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        if (counter) counter.textContent = `${current + 1} / ${total}`;
+      }
+
+      prevBtn && prevBtn.addEventListener('click', () => goTo(current - 1));
+      nextBtn && nextBtn.addEventListener('click', () => goTo(current + 1));
+
+      // Touch / swipe support
+      let startX = 0;
+      carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener('touchend', e => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+      });
+    });
+  </script>
+</body>
+</html>
