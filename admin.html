@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carsvallo — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a; --bg2: #111; --bg3: #181818; --bg4: #222;
+      --teal: #1AA3B0; --teal-dark: #148A96;
+      --text: #f0f0f0; --muted: #666; --border: #2a2a2a;
+      --red: #e05555; --green: #2ecc71;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+    }
+    .login-box {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 44px 40px; width: 100%; max-width: 380px; text-align: center;
+    }
+    .login-logo { height: 36px; width: auto; margin-bottom: 28px; opacity: .9; }
+    .login-box h2 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .login-box p { font-size: 0.82rem; color: var(--muted); margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 16px; color: var(--text);
+      font-size: 0.95rem; margin-bottom: 14px; outline: none;
+      transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: var(--teal); }
+    .login-box button {
+      width: 100%; background: var(--teal); color: #fff; border: none;
+      border-radius: 8px; padding: 13px; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .login-box button:hover { background: var(--teal-dark); }
+    .login-error { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
+
+    /* ── ADMIN LAYOUT ── */
+    #adminScreen { display: none; min-height: 100vh; }
+    .admin-nav {
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      padding: 16px 32px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .admin-nav img { height: 30px; opacity: .9; }
+    .admin-nav-right { display: flex; align-items: center; gap: 16px; }
+    .admin-nav span { font-size: 0.78rem; color: var(--muted); }
+    .btn-logout {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 7px 14px; border-radius: 6px; font-size: 0.78rem; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    .admin-main { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+    }
+    .admin-header h1 { font-size: 1.4rem; font-weight: 700; }
+    .admin-header p { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+    .btn-primary {
+      background: var(--teal); color: #fff; border: none; border-radius: 8px;
+      padding: 11px 22px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: background .2s; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-secondary {
+      background: var(--bg3); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 18px; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-danger {
+      background: transparent; color: var(--red); border: 1px solid transparent;
+      border-radius: 6px; padding: 7px 12px; font-size: 0.78rem; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-danger:hover { border-color: var(--red); background: rgba(224,85,85,.08); }
+
+    /* ── CARS GRID ── */
+    .cars-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+    }
+    .car-admin-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; transition: border-color .2s;
+    }
+    .car-admin-card:hover { border-color: #3a3a3a; }
+    .car-admin-card.inactive { opacity: .5; }
+    .car-thumb {
+      width: 100%; height: 180px; object-fit: cover; background: var(--bg3);
+      display: block;
+    }
+    .car-thumb-placeholder {
+      width: 100%; height: 180px; background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 2rem;
+    }
+    .car-admin-body { padding: 18px 20px 20px; }
+    .car-admin-meta { font-size: 0.72rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 6px; }
+    .car-admin-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .car-admin-specs { font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; }
+    .car-admin-actions { display: flex; gap: 8px; align-items: center; }
+    .badge-active { font-size: 0.68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+      background: rgba(26,163,176,.15); color: var(--teal); margin-left: auto; }
+    .badge-inactive { font-size: 0.68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+      background: rgba(102,102,102,.15); color: var(--muted); margin-left: auto; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(8px);
+      z-index: 500; display: none; align-items: flex-start; justify-content: center;
+      padding: 40px 20px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+      width: 100%; max-width: 580px; padding: 36px; position: relative;
+      margin: auto;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted); font-size: 1.4rem;
+      cursor: pointer; line-height: 1; padding: 4px 8px; border-radius: 4px;
+      transition: color .2s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 24px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.78rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .form-group input, .form-group select {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--text); font-size: 0.9rem; outline: none;
+      transition: border-color .2s; font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--teal); }
+    .form-group select option { background: var(--bg3); }
+
+    .upload-area {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 28px;
+      text-align: center; cursor: pointer; transition: all .2s; position: relative;
+    }
+    .upload-area:hover, .upload-area.drag { border-color: var(--teal); background: rgba(26,163,176,.05); }
+    .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-area p { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+    .upload-area strong { font-size: 0.9rem; color: var(--text); }
+
+    .photo-previews {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;
+      margin-top: 14px;
+    }
+    .photo-preview-item { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; }
+    .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-preview-item .remove-photo {
+      position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,.7);
+      border: none; color: #fff; width: 20px; height: 20px; border-radius: 50%;
+      font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .cover-badge {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(26,163,176,.85); color: #fff;
+      font-size: 0.6rem; font-weight: 700; text-align: center; padding: 3px;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 28px; justify-content: flex-end; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 20px; font-size: 0.85rem; color: var(--text);
+      opacity: 0; transition: all .3s; pointer-events: none; z-index: 1000;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: var(--green); color: var(--green); }
+    #toast.error { border-color: var(--red); color: var(--red); }
+
+    .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 0.9rem; }
+    .spinner {
+      width: 32px; height: 32px; border: 2px solid var(--border);
+      border-top-color: var(--teal); border-radius: 50%;
+      animation: spin .7s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      .admin-main { padding: 24px 16px; }
+      .admin-nav { padding: 14px 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .modal { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <img src="Bajada Carsvallo blanco 1.png" alt="Carsvallo" class="login-logo"/>
+    <h2>Panel de Administración</h2>
+    <p>Ingresa tu contraseña para continuar</p>
+    <input type="password" id="pwdInput" placeholder="Contraseña" autocomplete="current-password"/>
+    <button onclick="doLogin()">Ingresar</button>
+    <p class="login-error" id="loginError">Contraseña incorrecta</p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen">
+  <nav class="admin-nav">
+    <img src="Bajada Carsvallo blanco 1.png" alt="Carsvallo"/>
+    <div class="admin-nav-right">
+      <span>Panel Admin</span>
+      <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <div>
+        <h1>Autos publicados</h1>
+        <p id="statsText">Cargando...</p>
+      </div>
+      <button class="btn-primary" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Agregar auto
+      </button>
+    </div>
+
+    <div id="carsContainer">
+      <div class="loading"><div class="spinner"></div>Cargando autos...</div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL AGREGAR / EDITAR -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 id="modalTitle">Agregar auto</h2>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Nombre del auto</label>
+        <input type="text" id="fNombre" placeholder="Ej: Toyota Corolla"/>
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="fTipo">
+          <option>SUV</option><option>Sedán</option><option>Hatchback</option>
+          <option>Station Wagon</option><option>Pickup</option><option>Van</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Año</label>
+        <input type="number" id="fAño" placeholder="2020" min="1990" max="2030"/>
+      </div>
+      <div class="form-group">
+        <label>Kilometraje (ej: 85.000)</label>
+        <input type="text" id="fKm" placeholder="85.000"/>
+      </div>
+      <div class="form-group">
+        <label>Transmisión</label>
+        <select id="fTransmision">
+          <option>Automático</option><option>Manual</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Número de dueños</label>
+        <input type="number" id="fDueños" value="1" min="1" max="10"/>
+      </div>
+      <div class="form-group form-full">
+        <label>Fotos del auto <span style="color:#555;font-weight:400">(la primera será la portada)</span></label>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fFotos" accept="image/*" multiple onchange="handlePhotos(this)"/>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <strong>Arrastra fotos aquí o haz clic</strong>
+          <p>JPG, PNG · Múltiples archivos · La primera = portada</p>
+        </div>
+        <div class="photo-previews" id="photoPreviews"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" id="saveBtn" onclick="saveCar()">
+        <span id="saveBtnText">Publicar auto</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ── Config ───────────────────────────────────────────────────
+  const REPO  = 'federicocarvallo/carsvallo';
+  const BRANCH = 'main';
+  const ENC_TOKEN = 'sO6YNPj9IXLWjipjSxHNJ/jTxXv2sIEjMdvtP4WkcjW4/sc46rxvGQ==';
+
+  let ghToken = null;
+  let allCars  = [];
+  let editingId = null;
+  let photoFiles = []; // {file, dataUrl}
+
+  // ── Crypto ───────────────────────────────────────────────────
+  async function decryptToken(password) {
+    const enc = atob(ENC_TOKEN);
+    const keyBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    const key = new Uint8Array(keyBytes);
+    const encBytes = new Uint8Array([...enc].map(c => c.charCodeAt(0)));
+    const dec = encBytes.map((b, i) => b ^ key[i % key.length]);
+    return new TextDecoder().decode(dec);
+  }
+
+  // ── Login ─────────────────────────────────────────────────────
+  document.getElementById('pwdInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function doLogin() {
+    const pwd = document.getElementById('pwdInput').value;
+    const err = document.getElementById('loginError');
+    err.style.display = 'none';
+    try {
+      const tok = await decryptToken(pwd);
+      // Verificar token contra GitHub
+      const r = await fetch(`https://api.github.com/repos/${REPO}`, {
+        headers: { Authorization: `token ${tok}` }
+      });
+      if (!r.ok) throw new Error('Token inválido');
+      ghToken = tok;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminScreen').style.display = 'block';
+      loadCars();
+    } catch {
+      err.style.display = 'block';
+    }
+  }
+
+  function doLogout() {
+    ghToken = null;
+    document.getElementById('adminScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('pwdInput').value = '';
+  }
+
+  // ── GitHub API ────────────────────────────────────────────────
+  async function ghGet(path) {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`, {
+      headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!r.ok) throw new Error(`GET ${path} → ${r.status}`);
+    return r.json();
+  }
+
+  async function ghPut(path, content, message, sha) {
+    const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
+    if (sha) body.sha = sha;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+    return r.json();
+  }
+
+  async function ghPutBinary(path, base64Content, message, sha) {
+    const body = { message, content: base64Content, branch: BRANCH };
+    if (sha) body.sha = sha;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+    return r.json();
+  }
+
+  // ── Load Cars ─────────────────────────────────────────────────
+  async function loadCars() {
+    try {
+      const data = await ghGet('cars.json');
+      allCars = JSON.parse(atob(data.content.replace(/\n/g,'')));
+      renderCars();
+    } catch(e) {
+      document.getElementById('carsContainer').innerHTML =
+        `<div class="loading">Error cargando autos: ${e.message}</div>`;
+    }
+  }
+
+  function renderCars() {
+    const activos = allCars.filter(c => c.activo).length;
+    document.getElementById('statsText').textContent =
+      `${activos} auto${activos !== 1 ? 's' : ''} publicado${activos !== 1 ? 's' : ''} · ${allCars.length} en total`;
+
+    if (allCars.length === 0) {
+      document.getElementById('carsContainer').innerHTML =
+        '<div class="loading">No hay autos. Agrega el primero.</div>';
+      return;
+    }
+
+    document.getElementById('carsContainer').innerHTML = `
+      <div class="cars-grid">
+        ${allCars.map(car => `
+          <div class="car-admin-card ${car.activo ? '' : 'inactive'}">
+            <img class="car-thumb"
+              src="${car.carpeta}/01.jpg?v=${Date.now()}"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+              alt="${car.nombre}"/>
+            <div class="car-thumb-placeholder" style="display:none">🚗</div>
+            <div class="car-admin-body">
+              <div class="car-admin-meta">${car.tipo} · ${car.año}</div>
+              <div class="car-admin-name">${car.nombre}</div>
+              <div class="car-admin-specs">${car.km} km · ${car.transmision} · ${car.dueños} dueño${car.dueños>1?'s':''} · ${car.fotos} fotos</div>
+              <div class="car-admin-actions">
+                <button class="btn-secondary" onclick="editCar('${car.id}')">Editar</button>
+                <button class="btn-danger" onclick="toggleActivo('${car.id}')">
+                  ${car.activo ? 'Despublicar' : 'Publicar'}
+                </button>
+                <span class="${car.activo ? 'badge-active' : 'badge-inactive'}">
+                  ${car.activo ? 'Publicado' : 'Oculto'}
+                </span>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  // ── Save cars.json ────────────────────────────────────────────
+  async function saveCarsJson(message) {
+    const data = await ghGet('cars.json');
+    await ghPut('cars.json', JSON.stringify(allCars, null, 2), message, data.sha);
+  }
+
+  // ── Toggle activo ─────────────────────────────────────────────
+  async function toggleActivo(id) {
+    const car = allCars.find(c => c.id === id);
+    if (!car) return;
+    car.activo = !car.activo;
+    try {
+      await saveCarsJson(`${car.activo ? 'Publica' : 'Oculta'} ${car.nombre}`);
+      renderCars();
+      showToast(`${car.nombre} ${car.activo ? 'publicado ✓' : 'ocultado'}`, 'success');
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    }
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────
+  function openModal(id) {
+    editingId = id || null;
+    photoFiles = [];
+    document.getElementById('photoPreviews').innerHTML = '';
+    document.getElementById('modalTitle').textContent = id ? 'Editar auto' : 'Agregar auto';
+    document.getElementById('saveBtnText').textContent = id ? 'Guardar cambios' : 'Publicar auto';
+
+    if (id) {
+      const car = allCars.find(c => c.id === id);
+      document.getElementById('fNombre').value = car.nombre;
+      document.getElementById('fTipo').value = car.tipo;
+      document.getElementById('fAño').value = car.año;
+      document.getElementById('fKm').value = car.km;
+      document.getElementById('fTransmision').value = car.transmision;
+      document.getElementById('fDueños').value = car.dueños;
+    } else {
+      document.getElementById('fNombre').value = '';
+      document.getElementById('fAño').value = '';
+      document.getElementById('fKm').value = '';
+      document.getElementById('fDueños').value = '1';
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function editCar(id) { openModal(id); }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+  // ── Fotos ─────────────────────────────────────────────────────
+  function handlePhotos(input) {
+    const files = Array.from(input.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        photoFiles.push({ file, dataUrl: e.target.result });
+        renderPhotoPreviews();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPhotoPreviews() {
+    const container = document.getElementById('photoPreviews');
+    container.innerHTML = photoFiles.map((p, i) => `
+      <div class="photo-preview-item">
+        <img src="${p.dataUrl}" alt="foto ${i+1}"/>
+        <button class="remove-photo" onclick="removePhoto(${i})">×</button>
+        ${i === 0 ? '<div class="cover-badge">Portada</div>' : ''}
+      </div>
+    `).join('');
+  }
+
+  function removePhoto(idx) {
+    photoFiles.splice(idx, 1);
+    renderPhotoPreviews();
+  }
+
+  // Drag & drop
+  const ua = document.getElementById('uploadArea');
+  ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('drag'); });
+  ua.addEventListener('dragleave', () => ua.classList.remove('drag'));
+  ua.addEventListener('drop', e => {
+    e.preventDefault(); ua.classList.remove('drag');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => { photoFiles.push({ file, dataUrl: ev.target.result }); renderPhotoPreviews(); };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // ── Guardar auto ──────────────────────────────────────────────
+  async function saveCar() {
+    const nombre = document.getElementById('fNombre').value.trim();
+    const tipo   = document.getElementById('fTipo').value;
+    const año    = parseInt(document.getElementById('fAño').value);
+    const km     = document.getElementById('fKm').value.trim();
+    const trans  = document.getElementById('fTransmision').value;
+    const dueños = parseInt(document.getElementById('fDueños').value);
+
+    if (!nombre || !año || !km) { showToast('Completa nombre, año y km', 'error'); return; }
+    if (!editingId && photoFiles.length === 0) { showToast('Agrega al menos una foto', 'error'); return; }
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    document.getElementById('saveBtnText').textContent = 'Guardando...';
+
+    try {
+      let id = editingId;
+      let carpeta;
+
+      if (!id) {
+        // Nuevo auto: generar id y carpeta
+        id = nombre.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+        carpeta = `fotos/${id}`;
+      } else {
+        carpeta = allCars.find(c => c.id === id).carpeta;
+      }
+
+      // Subir fotos si hay
+      let fotoCount = editingId ? allCars.find(c => c.id === id).fotos : 0;
+      if (photoFiles.length > 0) {
+        showToast(`Subiendo ${photoFiles.length} foto(s)...`);
+        fotoCount = photoFiles.length;
+        for (let i = 0; i < photoFiles.length; i++) {
+          const base64 = photoFiles[i].dataUrl.split(',')[1];
+          const fname  = `${carpeta}/${String(i+1).padStart(2,'0')}.jpg`;
+          // Verificar si existe para obtener sha
+          let sha;
+          try { const ex = await ghGet(fname); sha = ex.sha; } catch {}
+          await ghPutBinary(fname, base64, `Foto ${i+1} de ${nombre}`, sha);
+        }
+      }
+
+      // Actualizar o agregar en allCars
+      const carData = { id, nombre, tipo, año, km, transmision: trans, dueños, fotos: fotoCount, carpeta, activo: true };
+      if (editingId) {
+        const idx = allCars.findIndex(c => c.id === id);
+        allCars[idx] = { ...allCars[idx], ...carData };
+      } else {
+        allCars.push(carData);
+      }
+
+      await saveCarsJson(`${editingId ? 'Actualiza' : 'Agrega'} ${nombre}`);
+      closeModal();
+      renderCars();
+      showToast(`${nombre} guardado con éxito ✓`, 'success');
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('saveBtnText').textContent = editingId ? 'Guardar cambios' : 'Publicar auto';
+    }
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.className = '', 3000);
+  }
+</script>
+</body>
+</html>

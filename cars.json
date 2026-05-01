@@ -1,0 +1,38 @@
+[
+  {
+    "id": "subaru",
+    "nombre": "Subaru Forester",
+    "tipo": "SUV",
+    "año": 2019,
+    "km": "97.000",
+    "transmision": "Automático",
+    "dueños": 2,
+    "fotos": 8,
+    "carpeta": "fotos/subaru",
+    "activo": true
+  },
+  {
+    "id": "fusion",
+    "nombre": "Ford Fusion",
+    "tipo": "Sedán",
+    "año": 2018,
+    "km": "85.000",
+    "transmision": "Automático",
+    "dueños": 1,
+    "fotos": 8,
+    "carpeta": "fotos/fusion",
+    "activo": true
+  },
+  {
+    "id": "volvo",
+    "nombre": "Volvo XC60",
+    "tipo": "SUV",
+    "año": 2018,
+    "km": "72.000",
+    "transmision": "Automático",
+    "dueños": 1,
+    "fotos": 9,
+    "carpeta": "fotos/volvo",
+    "activo": true
+  }
+]
