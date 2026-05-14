@@ -36,5 +36,17 @@
     "fotos": 9,
     "carpeta": "fotos/volvo",
     "activo": true
+  },
+  {
+    "id": "suzuki-vitara",
+    "nombre": "Suzuki Vitara",
+    "tipo": "Station Wagon",
+    "año": 2012,
+    "km": "152000",
+    "transmision": "Manual",
+    "dueños": 2,
+    "fotos": 8,
+    "carpeta": "fotos/suzuki-vitara",
+    "activo": true
   }
 ]
